@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Missing Person Outfit Visualization MVP</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="panel form-panel">
+        <div class="title-block">
+          <p class="eyebrow">Prototype</p>
+          <h1>Missing Person Outfit Visualization</h1>
+        </div>
+
+        <form id="generate-form" class="form-grid">
+          <label>
+            <span>Gender</span>
+            <select id="gender" name="gender">
+              <option value="male">male</option>
+              <option value="female">female</option>
+              <option value="unknown">unknown</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Age Group</span>
+            <select id="age_group" name="age_group">
+              <option value="child">child</option>
+              <option value="teenager">teenager</option>
+              <option value="adult">adult</option>
+              <option value="elderly" selected>elderly</option>
+              <option value="unknown">unknown</option>
+            </select>
+          </label>
+
+          <label class="full">
+            <span>Top description</span>
+            <input id="top" name="top" type="text" value="red checkered shirt" placeholder="red hoodie, blue jacket, white shirt" />
+          </label>
+
+          <label class="full">
+            <span>Bottom description</span>
+            <input id="bottom" name="bottom" type="text" value="black pants" placeholder="black pants, blue jeans" />
+          </label>
+
+          <label class="full">
+            <span>Accessory description</span>
+            <input id="accessory" name="accessory" type="text" value="black backpack" placeholder="black backpack, white cap" />
+          </label>
+
+          <label class="full">
+            <span>Output filename, optional</span>
+            <input id="output_filename" name="output_filename" type="text" value="sample_result" placeholder="sample_result" />
+          </label>
+
+          <div class="actions full">
+            <button id="generate-button" type="submit">Generate PNG</button>
+            <button id="download-button" type="button" disabled>Download Result</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel preview-panel">
+        <div class="preview-header">
+          <div>
+            <p class="eyebrow">Output</p>
+            <h2>Preview</h2>
+          </div>
+          <span id="status-pill" class="status-pill">Idle</span>
+        </div>
+
+        <div class="preview-frame">
+          <img id="preview-image" alt="Generated outfit visualization preview" />
+          <div id="empty-preview" class="empty-preview">PNG preview will appear here.</div>
+        </div>
+
+        <pre id="result-json" class="result-json"></pre>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

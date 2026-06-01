@@ -1,0 +1,120 @@
+[
+  {
+    "id": "top_001",
+    "category": "top",
+    "image_path": "data/clothes/top_001.png",
+    "tags": [
+      "red",
+      "hoodie",
+      "casual"
+    ],
+    "description": "red hoodie"
+  },
+  {
+    "id": "top_002",
+    "category": "top",
+    "image_path": "data/clothes/top_002.png",
+    "tags": [
+      "blue",
+      "jacket",
+      "outerwear"
+    ],
+    "description": "blue jacket"
+  },
+  {
+    "id": "top_003",
+    "category": "top",
+    "image_path": "data/clothes/top_003.png",
+    "tags": [
+      "white",
+      "shirt",
+      "formal"
+    ],
+    "description": "white shirt"
+  },
+  {
+    "id": "top_004",
+    "category": "top",
+    "image_path": "data/clothes/top_004.png",
+    "tags": [
+      "red",
+      "checkered",
+      "shirt"
+    ],
+    "description": "red checkered shirt"
+  },
+  {
+    "id": "top_005",
+    "category": "top",
+    "image_path": "data/clothes/top_005.png",
+    "tags": [
+      "black",
+      "t-shirt",
+      "shirt"
+    ],
+    "description": "black t-shirt"
+  },
+  {
+    "id": "bottom_001",
+    "category": "bottom",
+    "image_path": "data/clothes/bottom_001.png",
+    "tags": [
+      "black",
+      "pants"
+    ],
+    "description": "black pants"
+  },
+  {
+    "id": "bottom_002",
+    "category": "bottom",
+    "image_path": "data/clothes/bottom_002.png",
+    "tags": [
+      "blue",
+      "jeans",
+      "denim"
+    ],
+    "description": "blue jeans"
+  },
+  {
+    "id": "bottom_003",
+    "category": "bottom",
+    "image_path": "data/clothes/bottom_003.png",
+    "tags": [
+      "gray",
+      "skirt"
+    ],
+    "description": "gray skirt"
+  },
+  {
+    "id": "accessory_001",
+    "category": "accessory",
+    "image_path": "data/clothes/accessory_001.png",
+    "tags": [
+      "black",
+      "backpack",
+      "bag"
+    ],
+    "description": "black backpack"
+  },
+  {
+    "id": "accessory_002",
+    "category": "accessory",
+    "image_path": "data/clothes/accessory_002.png",
+    "tags": [
+      "white",
+      "cap",
+      "hat"
+    ],
+    "description": "white cap"
+  },
+  {
+    "id": "accessory_003",
+    "category": "accessory",
+    "image_path": "data/clothes/accessory_003.png",
+    "tags": [
+      "brown",
+      "bag"
+    ],
+    "description": "brown bag"
+  }
+]
