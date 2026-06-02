@@ -8,13 +8,17 @@ from app.config import MANNEQUIN_DIR, PERSON_REF_DIR, PERSON_REF_METADATA_PATH
 from app.utils import resolve_project_path
 
 
-VALID_GENDERS = {"male", "female", "unknown"}
-VALID_AGE_GROUPS = {"child", "teenager", "adult", "elderly", "unknown"}
+VALID_GENDERS = {"male", "female"}
+VALID_AGE_GROUPS = {"adult", "kids"}
 
 
-def _safe_choice(value: str, allowed: set[str]) -> str:
-    value = (value or "unknown").lower().strip()
-    return value if value in allowed else "unknown"
+def _safe_choice(value: str, allowed: set[str], default: str) -> str:
+    value = (value or default).lower().strip()
+    return value if value in allowed else default
+
+
+def _normalize_age_group(age_group: str) -> str:
+    return "child" if age_group == "kids" else "adult"
 
 
 def _create_dummy_mannequin(path: Path) -> Path:
@@ -99,15 +103,12 @@ def _select_person_reference(gender: str, age_group: str) -> Optional[Path]:
 
 
 def select_mannequin(gender: str, age_group: str) -> Path:
-    gender = _safe_choice(gender, VALID_GENDERS)
-    age_group = _safe_choice(age_group, VALID_AGE_GROUPS)
-
-    person_reference = _select_person_reference(gender, age_group)
-    if person_reference:
-        return person_reference
+    gender = _safe_choice(gender, VALID_GENDERS, "male")
+    age_group = _safe_choice(age_group, VALID_AGE_GROUPS, "adult")
+    file_age_group = _normalize_age_group(age_group)
 
     candidates = [
-        MANNEQUIN_DIR / f"{gender}_{age_group}.png",
+        MANNEQUIN_DIR / f"{gender}_{file_age_group}.png",
         MANNEQUIN_DIR / f"{gender}_unknown.png",
         MANNEQUIN_DIR / "unknown_unknown.png",
     ]
@@ -115,5 +116,9 @@ def select_mannequin(gender: str, age_group: str) -> Path:
     for candidate in candidates:
         if candidate.exists():
             return candidate
+
+    person_reference = _select_person_reference(gender, age_group)
+    if person_reference:
+        return person_reference
 
     return _create_dummy_mannequin(MANNEQUIN_DIR / "unknown_unknown.png")

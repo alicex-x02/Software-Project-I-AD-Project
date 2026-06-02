@@ -18,7 +18,7 @@ def item_path(item):
 
 def main() -> None:
     gender = "male"
-    age_group = "elderly"
+    age_group = "kids"
     top = "red checkered shirt"
     bottom = "black pants"
     accessory = "black backpack"

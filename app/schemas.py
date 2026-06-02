@@ -3,13 +3,13 @@ from typing import Dict, Literal, Optional
 from pydantic import BaseModel, Field
 
 
-Gender = Literal["male", "female", "unknown"]
-AgeGroup = Literal["child", "teenager", "adult", "elderly", "unknown"]
+Gender = Literal["male", "female"]
+AgeGroup = Literal["adult", "kids"]
 
 
 class GenerateRequest(BaseModel):
-    gender: Gender = "unknown"
-    age_group: AgeGroup = "unknown"
+    gender: Gender = "male"
+    age_group: AgeGroup = "adult"
     top: str = Field(default="", max_length=200)
     bottom: str = Field(default="", max_length=200)
     accessory: str = Field(default="", max_length=200)

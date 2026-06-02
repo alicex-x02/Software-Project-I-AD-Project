@@ -12,3 +12,5 @@ The selector checks files in this order:
 2. `{gender}_unknown.png`
 3. `unknown_unknown.png`
 4. A generated dummy mannequin
+
+Public age-group input is `adult` or `kids`; `kids` maps to the existing `*_child.png` mannequin files.

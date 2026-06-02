@@ -159,11 +159,8 @@ def main() -> None:
     mannequins = [
         ("male", "child"),
         ("male", "adult"),
-        ("male", "elderly"),
         ("female", "child"),
         ("female", "adult"),
-        ("female", "elderly"),
-        ("unknown", "unknown"),
     ]
     for gender, age_group in mannequins:
         make_mannequin_image(MANNEQUIN_DIR / f"{gender}_{age_group}.png", gender, age_group)
