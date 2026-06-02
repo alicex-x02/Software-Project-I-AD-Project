@@ -32,6 +32,8 @@ def text_center(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int], text:
 
 
 def make_clothing_image(path: Path, category: str, description: str, color: tuple[int, int, int], accent: tuple[int, int, int] | None = None) -> None:
+    if path.exists():
+        return
     path.parent.mkdir(parents=True, exist_ok=True)
     image = Image.new("RGB", (320, 320), (248, 250, 252))
     draw = ImageDraw.Draw(image)
@@ -64,13 +66,18 @@ def make_clothing_image(path: Path, category: str, description: str, color: tupl
 
 
 def make_mannequin_image(path: Path, gender: str, age_group: str) -> None:
+    if path.exists():
+        return
     path.parent.mkdir(parents=True, exist_ok=True)
     image = Image.new("RGBA", (420, 640), (255, 255, 255, 0))
     draw = ImageDraw.Draw(image)
     font = load_font(28, bold=True)
     small_font = load_font(18)
 
-    if gender == "male":
+    if age_group == "kids":
+        color = (227, 233, 242, 255)
+        outline = (88, 100, 122, 255)
+    elif gender == "male":
         color = (211, 222, 245, 255)
         outline = (45, 82, 130, 255)
     elif gender == "female":
@@ -100,7 +107,10 @@ def make_mannequin_image(path: Path, gender: str, age_group: str) -> None:
     if age_group == "elderly":
         draw.line((center_x + 95, body_top + 160, center_x + 125, 600), fill=(94, 98, 105, 255), width=6)
 
-    label = f"{gender} {age_group}".replace("unknown unknown", "unknown")
+    if age_group == "kids":
+        label = "kids"
+    else:
+        label = f"{gender} {age_group}".replace("unknown unknown", "unknown")
     text_center(draw, (40, 590, 380, 628), label, small_font, (55, 65, 81, 255))
     image.save(path)
 
@@ -162,15 +172,23 @@ def main() -> None:
         ("female", "child"),
         ("female", "adult"),
     ]
+    created_mannequins = 0
     for gender, age_group in mannequins:
-        make_mannequin_image(MANNEQUIN_DIR / f"{gender}_{age_group}.png", gender, age_group)
+        target = MANNEQUIN_DIR / f"{gender}_{age_group}.png"
+        if not target.exists():
+            created_mannequins += 1
+        make_mannequin_image(target, gender, age_group)
+    kids_target = MANNEQUIN_DIR / "kids.png"
+    if not kids_target.exists():
+        created_mannequins += 1
+    make_mannequin_image(kids_target, "unknown", "kids")
 
     viton_metadata = load_existing_viton_metadata()
     METADATA_PATH.write_text(json.dumps(metadata + viton_metadata, indent=2), encoding="utf-8")
     print(f"Created {len(metadata)} clothing records in {METADATA_PATH}")
     if viton_metadata:
         print(f"Preserved {len(viton_metadata)} VITON-HD clothing records")
-    print(f"Created {len(mannequins)} mannequin images in {MANNEQUIN_DIR}")
+    print(f"Created {created_mannequins} mannequin images in {MANNEQUIN_DIR} (existing files were preserved)")
 
 
 if __name__ == "__main__":

@@ -56,3 +56,17 @@ def resolve_project_path(path_value: Optional[str]) -> Optional[Path]:
     if not path.is_absolute():
         path = BASE_DIR / path
     return path
+
+
+def normalize_gender(value: Optional[str]) -> str:
+    value = (value or "male").lower().strip()
+    return value if value in {"male", "female"} else "male"
+
+
+def normalize_age_group(value: Optional[str]) -> str:
+    value = (value or "adult").lower().strip()
+    if value in {"adult", "kids"}:
+        return value
+    if value in {"child", "teenager", "elderly", "unknown"}:
+        return "adult" if value != "child" else "kids"
+    return "adult"

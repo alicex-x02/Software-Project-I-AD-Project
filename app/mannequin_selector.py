@@ -17,10 +17,6 @@ def _safe_choice(value: str, allowed: set[str], default: str) -> str:
     return value if value in allowed else default
 
 
-def _normalize_age_group(age_group: str) -> str:
-    return "child" if age_group == "kids" else "adult"
-
-
 def _create_dummy_mannequin(path: Path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     image = Image.new("RGBA", (420, 640), (255, 255, 255, 0))
@@ -105,10 +101,22 @@ def _select_person_reference(gender: str, age_group: str) -> Optional[Path]:
 def select_mannequin(gender: str, age_group: str) -> Path:
     gender = _safe_choice(gender, VALID_GENDERS, "male")
     age_group = _safe_choice(age_group, VALID_AGE_GROUPS, "adult")
-    file_age_group = _normalize_age_group(age_group)
+
+    if age_group == "kids":
+        kids_path = MANNEQUIN_DIR / "kids.png"
+        if kids_path.exists():
+            return kids_path
+        fallback_candidates = [
+            MANNEQUIN_DIR / "unknown_unknown.png",
+            MANNEQUIN_DIR / f"{gender}_unknown.png",
+        ]
+        for candidate in fallback_candidates:
+            if candidate.exists():
+                return candidate
+        return _create_dummy_mannequin(MANNEQUIN_DIR / "kids.png")
 
     candidates = [
-        MANNEQUIN_DIR / f"{gender}_{file_age_group}.png",
+        MANNEQUIN_DIR / f"{gender}_adult.png",
         MANNEQUIN_DIR / f"{gender}_unknown.png",
         MANNEQUIN_DIR / "unknown_unknown.png",
     ]

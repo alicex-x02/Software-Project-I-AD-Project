@@ -1,15 +1,11 @@
-from typing import Dict, Literal, Optional
+from typing import Dict, Optional
 
 from pydantic import BaseModel, Field
 
 
-Gender = Literal["male", "female"]
-AgeGroup = Literal["adult", "kids"]
-
-
 class GenerateRequest(BaseModel):
-    gender: Gender = "male"
-    age_group: AgeGroup = "adult"
+    gender: str = "male"
+    age_group: str = "adult"
     top: str = Field(default="", max_length=200)
     bottom: str = Field(default="", max_length=200)
     accessory: str = Field(default="", max_length=200)

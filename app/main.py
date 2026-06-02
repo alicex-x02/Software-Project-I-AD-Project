@@ -11,7 +11,7 @@ from app.config import BASE_DIR, OUTPUT_DIR, WEB_DIR, ensure_runtime_dirs
 from app.image_generator import run_virtual_tryon
 from app.mannequin_selector import select_mannequin
 from app.schemas import GenerateRequest, GenerateResponse
-from app.utils import output_path_for, project_relative, resolve_project_path
+from app.utils import normalize_age_group, normalize_gender, output_path_for, project_relative, resolve_project_path
 
 
 ensure_runtime_dirs()
@@ -73,15 +73,17 @@ def _item_image_path(item: Optional[Dict]) -> Optional[Path]:
 @app.post("/generate", response_model=GenerateResponse)
 def generate(payload: GenerateRequest):
     output_path = output_path_for(payload.output_filename)
-    mannequin_path = select_mannequin(payload.gender, payload.age_group)
+    gender = normalize_gender(payload.gender)
+    age_group = normalize_age_group(payload.age_group)
+    mannequin_path = select_mannequin(gender, age_group)
 
     selected_top = retrieve_best_clothing(payload.top, "top") if payload.top.strip() else None
     selected_bottom = retrieve_best_clothing(payload.bottom, "bottom") if payload.bottom.strip() else None
     selected_accessory = retrieve_best_clothing(payload.accessory, "accessory") if payload.accessory.strip() else None
 
     prompt = {
-        "gender": payload.gender,
-        "age_group": payload.age_group,
+        "gender": gender,
+        "age_group": age_group,
         "top": payload.top,
         "bottom": payload.bottom,
         "accessory": payload.accessory,

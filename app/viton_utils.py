@@ -50,6 +50,16 @@ def find_viton_person_dir(viton_dir: Path = VITON_HD_DIR) -> Optional[Path]:
     )
 
 
+def find_viton_cloth_mask_dir(viton_dir: Path = VITON_HD_DIR) -> Optional[Path]:
+    return first_existing_dir(
+        [
+            viton_dir / "test" / "cloth-mask",
+            viton_dir / "cloth-mask",
+            viton_dir / "train" / "cloth-mask",
+        ]
+    )
+
+
 def project_relative(path: Path) -> str:
     try:
         return path.resolve().relative_to(BASE_DIR).as_posix()

@@ -1,8 +1,10 @@
 import json
 import re
+from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Set
 
-from app.config import METADATA_PATH
+from app.config import METADATA_PATH, VITON_HD_DIR
+from app.viton_utils import find_viton_cloth_dir, list_images, project_relative, safe_id_part, tokens_from_filename
 
 
 TOKEN_SPLIT_PATTERN = re.compile(r"[\s,\-]+")
@@ -46,6 +48,28 @@ def _is_real_dataset_item(item: Dict) -> bool:
     return bool(source and source != "dummy_sample")
 
 
+def _viton_cloth_items_from_disk(limit: Optional[int] = None) -> List[Dict]:
+    cloth_dir = find_viton_cloth_dir(VITON_HD_DIR)
+    cloth_images = list_images(cloth_dir, limit)
+    items: List[Dict] = []
+    for path in cloth_images:
+        tokens = tokens_from_filename(path)
+        items.append(
+            {
+                "id": f"viton_top_{safe_id_part(path)}",
+                "category": "top",
+                "image_path": project_relative(path),
+                "tags": sorted(set(["viton", "viton-hd", "cloth", "clothing", "top", "upper"] + tokens)),
+                "manual_tags": [],
+                "description": f"VITON-HD top {path.stem}",
+                "source_dataset": "VITON-HD",
+                "source_path": project_relative(path),
+                "needs_manual_tags": True,
+            }
+        )
+    return items
+
+
 def score_item(query_tokens: Sequence[str], item: Dict) -> int:
     item_tokens = _item_tokens(item)
     return len(set(query_tokens) & item_tokens)
@@ -59,23 +83,28 @@ def retrieve_best_clothing(description: str, category: str) -> Optional[Dict]:
     and text embeddings while preserving API behavior.
     """
     category_items = [item for item in load_metadata() if item.get("category") == category]
+
+    if category == "top":
+        viton_items = [item for item in category_items if _is_real_dataset_item(item)]
+        if not viton_items:
+            viton_items = _viton_cloth_items_from_disk()
+        if viton_items:
+            category_items = viton_items
+
     if not category_items:
         return None
 
-    real_dataset_items = [item for item in category_items if _is_real_dataset_item(item)]
-    search_items = real_dataset_items or category_items
-
     query_tokens = tokenize_text(description)
-    best_item = search_items[0]
+    best_item = category_items[0]
     best_score = -1
 
-    for item in search_items:
+    for item in category_items:
         score = score_item(query_tokens, item)
         if score > best_score:
             best_item = item
             best_score = score
 
     if best_score <= 0:
-        return search_items[0]
+        return category_items[0]
 
     return best_item
