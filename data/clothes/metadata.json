@@ -8,7 +8,10 @@
       "hoodie",
       "casual"
     ],
-    "description": "red hoodie"
+    "manual_tags": [],
+    "description": "red hoodie",
+    "source_dataset": "dummy_sample",
+    "needs_manual_tags": false
   },
   {
     "id": "top_002",
@@ -19,7 +22,10 @@
       "jacket",
       "outerwear"
     ],
-    "description": "blue jacket"
+    "manual_tags": [],
+    "description": "blue jacket",
+    "source_dataset": "dummy_sample",
+    "needs_manual_tags": false
   },
   {
     "id": "top_003",
@@ -30,7 +36,10 @@
       "shirt",
       "formal"
     ],
-    "description": "white shirt"
+    "manual_tags": [],
+    "description": "white shirt",
+    "source_dataset": "dummy_sample",
+    "needs_manual_tags": false
   },
   {
     "id": "top_004",
@@ -41,7 +50,10 @@
       "checkered",
       "shirt"
     ],
-    "description": "red checkered shirt"
+    "manual_tags": [],
+    "description": "red checkered shirt",
+    "source_dataset": "dummy_sample",
+    "needs_manual_tags": false
   },
   {
     "id": "top_005",
@@ -52,7 +64,10 @@
       "t-shirt",
       "shirt"
     ],
-    "description": "black t-shirt"
+    "manual_tags": [],
+    "description": "black t-shirt",
+    "source_dataset": "dummy_sample",
+    "needs_manual_tags": false
   },
   {
     "id": "bottom_001",
@@ -62,7 +77,10 @@
       "black",
       "pants"
     ],
-    "description": "black pants"
+    "manual_tags": [],
+    "description": "black pants",
+    "source_dataset": "dummy_sample",
+    "needs_manual_tags": false
   },
   {
     "id": "bottom_002",
@@ -73,7 +91,10 @@
       "jeans",
       "denim"
     ],
-    "description": "blue jeans"
+    "manual_tags": [],
+    "description": "blue jeans",
+    "source_dataset": "dummy_sample",
+    "needs_manual_tags": false
   },
   {
     "id": "bottom_003",
@@ -83,7 +104,10 @@
       "gray",
       "skirt"
     ],
-    "description": "gray skirt"
+    "manual_tags": [],
+    "description": "gray skirt",
+    "source_dataset": "dummy_sample",
+    "needs_manual_tags": false
   },
   {
     "id": "accessory_001",
@@ -94,7 +118,10 @@
       "backpack",
       "bag"
     ],
-    "description": "black backpack"
+    "manual_tags": [],
+    "description": "black backpack",
+    "source_dataset": "dummy_sample",
+    "needs_manual_tags": false
   },
   {
     "id": "accessory_002",
@@ -105,7 +132,10 @@
       "cap",
       "hat"
     ],
-    "description": "white cap"
+    "manual_tags": [],
+    "description": "white cap",
+    "source_dataset": "dummy_sample",
+    "needs_manual_tags": false
   },
   {
     "id": "accessory_003",
@@ -115,6 +145,639 @@
       "brown",
       "bag"
     ],
-    "description": "brown bag"
+    "manual_tags": [],
+    "description": "brown bag",
+    "source_dataset": "dummy_sample",
+    "needs_manual_tags": false
+  },
+  {
+    "id": "viton_top_00006_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00006_00.jpg",
+    "tags": [
+      "00",
+      "00006",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00006_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00006_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00008_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00008_00.jpg",
+    "tags": [
+      "00",
+      "00008",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00008_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00008_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00013_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00013_00.jpg",
+    "tags": [
+      "00",
+      "00013",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00013_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00013_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00017_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00017_00.jpg",
+    "tags": [
+      "00",
+      "00017",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00017_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00017_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00034_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00034_00.jpg",
+    "tags": [
+      "00",
+      "00034",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00034_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00034_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00035_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00035_00.jpg",
+    "tags": [
+      "00",
+      "00035",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00035_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00035_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00055_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00055_00.jpg",
+    "tags": [
+      "00",
+      "00055",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00055_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00055_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00057_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00057_00.jpg",
+    "tags": [
+      "00",
+      "00057",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00057_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00057_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00064_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00064_00.jpg",
+    "tags": [
+      "00",
+      "00064",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00064_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00064_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00067_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00067_00.jpg",
+    "tags": [
+      "00",
+      "00067",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00067_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00067_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00069_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00069_00.jpg",
+    "tags": [
+      "00",
+      "00069",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00069_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00069_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00071_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00071_00.jpg",
+    "tags": [
+      "00",
+      "00071",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00071_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00071_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00074_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00074_00.jpg",
+    "tags": [
+      "00",
+      "00074",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00074_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00074_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00075_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00075_00.jpg",
+    "tags": [
+      "00",
+      "00075",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00075_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00075_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00084_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00084_00.jpg",
+    "tags": [
+      "00",
+      "00084",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00084_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00084_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00094_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00094_00.jpg",
+    "tags": [
+      "00",
+      "00094",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00094_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00094_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00095_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00095_00.jpg",
+    "tags": [
+      "00",
+      "00095",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00095_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00095_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00096_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00096_00.jpg",
+    "tags": [
+      "00",
+      "00096",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00096_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00096_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00110_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00110_00.jpg",
+    "tags": [
+      "00",
+      "00110",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00110_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00110_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00112_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00112_00.jpg",
+    "tags": [
+      "00",
+      "00112",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00112_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00112_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00121_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00121_00.jpg",
+    "tags": [
+      "00",
+      "00121",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00121_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00121_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00126_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00126_00.jpg",
+    "tags": [
+      "00",
+      "00126",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00126_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00126_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00127_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00127_00.jpg",
+    "tags": [
+      "00",
+      "00127",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00127_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00127_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00135_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00135_00.jpg",
+    "tags": [
+      "00",
+      "00135",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00135_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00135_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00145_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00145_00.jpg",
+    "tags": [
+      "00",
+      "00145",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00145_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00145_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00151_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00151_00.jpg",
+    "tags": [
+      "00",
+      "00151",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00151_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00151_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00158_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00158_00.jpg",
+    "tags": [
+      "00",
+      "00158",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00158_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00158_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00176_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00176_00.jpg",
+    "tags": [
+      "00",
+      "00176",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00176_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00176_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00190_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00190_00.jpg",
+    "tags": [
+      "00",
+      "00190",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00190_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00190_00.jpg",
+    "needs_manual_tags": true
+  },
+  {
+    "id": "viton_top_00205_00",
+    "category": "top",
+    "image_path": "data/viton_hd/test/cloth/00205_00.jpg",
+    "tags": [
+      "00",
+      "00205",
+      "cloth",
+      "clothing",
+      "shirt",
+      "top",
+      "upper",
+      "viton",
+      "viton-hd"
+    ],
+    "manual_tags": [],
+    "description": "VITON-HD top 00205_00",
+    "source_dataset": "VITON-HD",
+    "source_path": "data/viton_hd/test/cloth/00205_00.jpg",
+    "needs_manual_tags": true
   }
 ]

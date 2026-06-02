@@ -1,6 +1,5 @@
 import json
 import re
-from functools import lru_cache
 from typing import Dict, List, Optional, Sequence, Set
 
 from app.config import METADATA_PATH
@@ -9,7 +8,6 @@ from app.config import METADATA_PATH
 TOKEN_SPLIT_PATTERN = re.compile(r"[\s,\-]+")
 
 
-@lru_cache(maxsize=1)
 def load_metadata() -> List[Dict]:
     """Load clothes metadata from data/clothes/metadata.json."""
     if not METADATA_PATH.exists():
@@ -33,12 +31,19 @@ def tokenize_text(text: str) -> Set[str]:
 
 
 def _item_tokens(item: Dict) -> Set[str]:
-    tags = item.get("tags") or []
+    tags = (item.get("tags") or []) + (item.get("manual_tags") or [])
     description = item.get("description") or ""
     tokens = tokenize_text(description)
     for tag in tags:
         tokens.update(tokenize_text(str(tag)))
+    tokens.update(tokenize_text(str(item.get("id") or "")))
+    tokens.update(tokenize_text(str(item.get("image_path") or "")))
     return tokens
+
+
+def _is_real_dataset_item(item: Dict) -> bool:
+    source = str(item.get("source_dataset") or "").lower()
+    return bool(source and source != "dummy_sample")
 
 
 def score_item(query_tokens: Sequence[str], item: Dict) -> int:
@@ -53,23 +58,24 @@ def retrieve_best_clothing(description: str, category: str) -> Optional[Dict]:
     retriever can keep this function signature and replace scoring with image
     and text embeddings while preserving API behavior.
     """
-    category_items = [
-        item for item in load_metadata() if item.get("category") == category
-    ]
+    category_items = [item for item in load_metadata() if item.get("category") == category]
     if not category_items:
         return None
 
+    real_dataset_items = [item for item in category_items if _is_real_dataset_item(item)]
+    search_items = real_dataset_items or category_items
+
     query_tokens = tokenize_text(description)
-    best_item = category_items[0]
+    best_item = search_items[0]
     best_score = -1
 
-    for item in category_items:
+    for item in search_items:
         score = score_item(query_tokens, item)
         if score > best_score:
             best_item = item
             best_score = score
 
     if best_score <= 0:
-        return category_items[0]
+        return search_items[0]
 
     return best_item

@@ -105,6 +105,22 @@ def make_mannequin_image(path: Path, gender: str, age_group: str) -> None:
     image.save(path)
 
 
+def load_existing_viton_metadata() -> list[dict]:
+    if not METADATA_PATH.exists():
+        return []
+    try:
+        data = json.loads(METADATA_PATH.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return []
+    if not isinstance(data, list):
+        return []
+    return [
+        item
+        for item in data
+        if isinstance(item, dict) and item.get("source_dataset") == "VITON-HD"
+    ]
+
+
 def main() -> None:
     MANNEQUIN_DIR.mkdir(parents=True, exist_ok=True)
     CLOTHES_DIR.mkdir(parents=True, exist_ok=True)
@@ -133,7 +149,10 @@ def main() -> None:
                 "category": category,
                 "image_path": f"data/clothes/{item_id}.png",
                 "tags": tags,
+                "manual_tags": [],
                 "description": description,
+                "source_dataset": "dummy_sample",
+                "needs_manual_tags": False,
             }
         )
 
@@ -149,8 +168,11 @@ def main() -> None:
     for gender, age_group in mannequins:
         make_mannequin_image(MANNEQUIN_DIR / f"{gender}_{age_group}.png", gender, age_group)
 
-    METADATA_PATH.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+    viton_metadata = load_existing_viton_metadata()
+    METADATA_PATH.write_text(json.dumps(metadata + viton_metadata, indent=2), encoding="utf-8")
     print(f"Created {len(metadata)} clothing records in {METADATA_PATH}")
+    if viton_metadata:
+        print(f"Preserved {len(viton_metadata)} VITON-HD clothing records")
     print(f"Created {len(mannequins)} mannequin images in {MANNEQUIN_DIR}")
 
 

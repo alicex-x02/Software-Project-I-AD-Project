@@ -26,6 +26,11 @@ softwareproject1/
   data/
     mannequins/
       README.md
+    person_refs/
+      README.md
+      metadata.json
+    viton_hd/
+      README.md
     clothes/
       README.md
       metadata.json
@@ -60,6 +65,99 @@ python scripts/build_sample_db.py
 ```
 
 이 명령은 `data/clothes/`에 dummy clothes PNG와 `metadata.json`을 만들고, `data/mannequins/`에 샘플 마네킹 PNG를 생성합니다.
+
+VITON-HD 데이터셋이 없을 때는 이 dummy sample DB가 자동 fallback으로 사용됩니다.
+
+## 2-1. VITON-HD 데이터셋 배치
+
+실제 옷/사람 이미지를 fallback PNG에 포함하려면 VITON-HD 데이터셋을 아래 위치에 둡니다.
+
+```text
+data/viton_hd/
+```
+
+지원하는 폴더 구조:
+
+```text
+data/viton_hd/
+  test/
+    cloth/
+      000001_00.jpg
+      ...
+    image/
+      000001_00.jpg
+      ...
+```
+
+또는:
+
+```text
+data/viton_hd/
+  cloth/
+  image/
+```
+
+VITON-HD 원본 데이터는 용량이 크므로 git에 올리지 않도록 `.gitignore`에 제외되어 있습니다.
+
+배치 확인:
+
+```bash
+python scripts/check_viton_hd.py
+```
+
+`Status: ready`가 나오면 import할 수 있습니다.
+
+## 2-2. VITON-HD 이미지 metadata 등록
+
+VITON-HD cloth 이미지를 `data/clothes/metadata.json`에 등록합니다. VITON-HD는 주로 upper-body cloth이므로 초기 category는 `top`으로 등록합니다.
+
+```bash
+python scripts/import_viton_clothes.py --limit 30
+```
+
+수동 태그를 한 번에 추가하고 싶으면:
+
+```bash
+python scripts/import_viton_clothes.py --limit 30 --manual-tags "shirt,top,casual"
+```
+
+VITON-HD person/model 이미지를 `data/person_refs/metadata.json`에 등록합니다.
+
+```bash
+python scripts/import_viton_persons.py --limit 12
+```
+
+기본 동작은 선택된 person/model 이미지를 `data/person_refs/viton/`에 복사하고 metadata에 등록하는 것입니다. 원본 VITON-HD 파일 경로만 참조하고 싶으면:
+
+```bash
+python scripts/import_viton_persons.py --limit 12 --no-copy
+```
+
+수동 태그 예시:
+
+```bash
+python scripts/import_viton_persons.py --limit 12 --manual-tags "adult,front-view"
+```
+
+metadata는 처음에 파일명 기반 id와 기본 태그를 넣습니다. 색상/종류를 더 정확히 맞추고 싶으면 `manual_tags`를 직접 편집하세요.
+
+예시:
+
+```json
+{
+  "id": "viton_top_000001_00",
+  "category": "top",
+  "image_path": "data/viton_hd/test/cloth/000001_00.jpg",
+  "tags": ["viton", "viton-hd", "cloth", "clothing", "top", "shirt", "upper"],
+  "manual_tags": ["red", "checkered"],
+  "description": "VITON-HD top 000001_00",
+  "source_dataset": "VITON-HD",
+  "source_path": "data/viton_hd/test/cloth/000001_00.jpg",
+  "needs_manual_tags": true
+}
+```
+
+VITON-HD metadata가 등록되어 있으면 `top` 검색은 실제 VITON-HD cloth 항목을 우선 사용합니다. `bottom`, `accessory`는 VITON-HD에 해당 항목이 없으면 기존 dummy sample DB로 fallback됩니다.
 
 ## 3. 서버 실행
 
@@ -145,6 +243,17 @@ python scripts/test_pipeline.py
 
 성공하면 `outputs/pipeline_test_result.png`가 생성됩니다.
 
+VITON-HD 데이터셋이 있는 경우:
+
+```bash
+python scripts/check_viton_hd.py
+python scripts/import_viton_clothes.py --limit 30
+python scripts/import_viton_persons.py --limit 12
+python scripts/test_pipeline.py
+```
+
+이 경우 fallback PNG 중앙에는 VITON-HD person/model 이미지가 들어가고, matched clothes 영역에는 VITON-HD cloth thumbnail이 표시됩니다.
+
 ## Clothing Retriever
 
 초기 버전은 태그 기반 검색입니다.
@@ -154,6 +263,7 @@ python scripts/test_pipeline.py
 - metadata의 `tags`, `description`과 비교
 - 가장 많이 겹치는 item 선택
 - 점수가 0이면 해당 category의 첫 번째 item을 default로 반환
+- VITON-HD 같은 실제 데이터셋 항목이 등록되어 있으면 dummy sample보다 실제 데이터셋 항목을 우선 검색
 
 향후에는 `retrieve_best_clothing(description, category)` 함수 내부의 scoring을 CLIP embedding 검색으로 교체할 수 있습니다.
 
@@ -211,6 +321,23 @@ python scripts/build_sample_db.py
 ```
 
 를 다시 실행하면 샘플 metadata와 dummy image가 재생성됩니다.
+
+### VITON-HD를 넣었는데 dummy 이미지가 나오는 경우
+
+먼저 데이터셋 폴더가 인식되는지 확인하세요.
+
+```bash
+python scripts/check_viton_hd.py
+```
+
+그다음 metadata import를 다시 실행하세요.
+
+```bash
+python scripts/import_viton_clothes.py --limit 30
+python scripts/import_viton_persons.py --limit 12
+```
+
+서버를 `--reload` 없이 실행 중이었다면 재시작해야 새 metadata와 코드가 반영됩니다.
 
 ### 포트 8000이 이미 사용 중인 경우
 

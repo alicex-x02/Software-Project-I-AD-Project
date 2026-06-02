@@ -4,3 +4,12 @@ __pycache__/
 
 outputs/*
 !outputs/.gitkeep
+
+data/viton_hd/*
+!data/viton_hd/.gitkeep
+!data/viton_hd/README.md
+
+data/person_refs/*
+!data/person_refs/.gitkeep
+!data/person_refs/README.md
+!data/person_refs/metadata.json
