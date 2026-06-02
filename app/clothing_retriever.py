@@ -1,10 +1,21 @@
 import json
 import re
+from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Set
 
-from app.config import METADATA_PATH, VITON_HD_DIR
-from app.viton_utils import find_viton_cloth_dir, list_images, project_relative, safe_id_part, tokens_from_filename
+from PIL import Image
+
+from app.config import DRESSCODE_DIR, METADATA_PATH, VITON_HD_DIR
+from app.utils import resolve_project_path
+from app.viton_utils import (
+    find_viton_cloth_dir,
+    list_images,
+    list_dresscode_garments,
+    project_relative,
+    safe_id_part,
+    tokens_from_filename,
+)
 
 
 TOKEN_SPLIT_PATTERN = re.compile(r"[\s,\-]+")
@@ -40,7 +51,71 @@ def _item_tokens(item: Dict) -> Set[str]:
         tokens.update(tokenize_text(str(tag)))
     tokens.update(tokenize_text(str(item.get("id") or "")))
     tokens.update(tokenize_text(str(item.get("image_path") or "")))
+    tokens.update(_infer_color_tags_from_image(item.get("image_path")))
     return tokens
+
+
+def _classify_color(rgb: tuple[int, int, int]) -> Optional[str]:
+    r, g, b = rgb
+    brightness = (r + g + b) / 3
+    max_c = max(rgb)
+    min_c = min(rgb)
+    chroma = max_c - min_c
+
+    if brightness < 55:
+        return "black"
+    if brightness > 220 and chroma < 30:
+        return "white"
+    if chroma < 24:
+        return "gray"
+    if r > g + 25 and r > b + 25:
+        return "red"
+    if b > r + 20 and b > g + 10:
+        return "blue"
+    if g > r + 20 and g > b + 10:
+        return "green"
+    return None
+
+
+@lru_cache(maxsize=256)
+def _infer_color_tags_from_image(image_path_value: Optional[str]) -> Set[str]:
+    if not image_path_value:
+        return set()
+
+    path = resolve_project_path(image_path_value) or Path(image_path_value)
+    if not path.exists():
+        return set()
+
+    try:
+        image = Image.open(path).convert("RGB").resize((48, 48))
+    except OSError:
+        return set()
+
+    samples = []
+    for r, g, b in image.getdata():
+        if r + g + b > 720:
+            continue
+        if abs(r - g) < 12 and abs(g - b) < 12 and r > 235:
+            continue
+        samples.append((r, g, b))
+
+    if not samples:
+        samples = list(image.getdata())
+
+    bucket_counts: Dict[str, int] = {}
+    for rgb in samples:
+        label = _classify_color(rgb)
+        if label:
+            bucket_counts[label] = bucket_counts.get(label, 0) + 1
+
+    if not bucket_counts:
+        return set()
+
+    ranked = sorted(bucket_counts.items(), key=lambda kv: kv[1], reverse=True)
+    dominant = {ranked[0][0]}
+    if len(ranked) > 1 and ranked[1][1] >= ranked[0][1] * 0.6:
+        dominant.add(ranked[1][0])
+    return dominant
 
 
 def _is_real_dataset_item(item: Dict) -> bool:
@@ -48,21 +123,24 @@ def _is_real_dataset_item(item: Dict) -> bool:
     return bool(source and source != "dummy_sample")
 
 
-def _viton_cloth_items_from_disk(limit: Optional[int] = None) -> List[Dict]:
-    cloth_dir = find_viton_cloth_dir(VITON_HD_DIR)
-    cloth_images = list_images(cloth_dir, limit)
+def _cloth_items_from_disk(dataset_name: str, dataset_dir: Path, category: str, limit: Optional[int] = None) -> List[Dict]:
+    if dataset_name == "DressCode":
+        cloth_images = list_dresscode_garments(dataset_dir, "upper_body" if category == "top" else "lower_body", limit)
+    else:
+        cloth_dir = find_viton_cloth_dir(dataset_dir)
+        cloth_images = list_images(cloth_dir, limit)
     items: List[Dict] = []
     for path in cloth_images:
         tokens = tokens_from_filename(path)
         items.append(
             {
-                "id": f"viton_top_{safe_id_part(path)}",
-                "category": "top",
+                "id": f"{dataset_name.lower()}_{category}_{safe_id_part(path)}",
+                "category": category,
                 "image_path": project_relative(path),
-                "tags": sorted(set(["viton", "viton-hd", "cloth", "clothing", "top", "upper"] + tokens)),
+                "tags": sorted(set([dataset_name.lower(), "cloth", "clothing", category, "upper"] + tokens)),
                 "manual_tags": [],
-                "description": f"VITON-HD top {path.stem}",
-                "source_dataset": "VITON-HD",
+                "description": f"{dataset_name} {category} {path.stem}",
+                "source_dataset": dataset_name,
                 "source_path": project_relative(path),
                 "needs_manual_tags": True,
             }
@@ -84,12 +162,18 @@ def retrieve_best_clothing(description: str, category: str) -> Optional[Dict]:
     """
     category_items = [item for item in load_metadata() if item.get("category") == category]
 
-    if category == "top":
-        viton_items = [item for item in category_items if _is_real_dataset_item(item)]
-        if not viton_items:
-            viton_items = _viton_cloth_items_from_disk()
-        if viton_items:
-            category_items = viton_items
+    if category in {"top", "bottom"}:
+        dresscode_items = [item for item in category_items if str(item.get("source_dataset") or "").lower() == "dresscode"]
+        if not dresscode_items:
+            dresscode_items = _cloth_items_from_disk("DressCode", DRESSCODE_DIR, category)
+        if dresscode_items:
+            category_items = dresscode_items
+        else:
+            viton_items = [item for item in category_items if _is_real_dataset_item(item)]
+            if not viton_items:
+                viton_items = _cloth_items_from_disk("VITON-HD", VITON_HD_DIR, category)
+            if viton_items:
+                category_items = viton_items
 
     if not category_items:
         return None

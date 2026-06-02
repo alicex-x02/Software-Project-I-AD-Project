@@ -1,12 +1,21 @@
+import os
+import tempfile
+import threading
 from pathlib import Path
 from typing import Dict, Optional
 
 from PIL import Image, ImageDraw, ImageFont
 
-from app.config import OUTPUT_DIR
+from app.config import MODELS_DIR, OUTPUT_DIR
 
 
-USE_REAL_VTON = False
+USE_REAL_VTON = os.getenv("USE_REAL_VTON", "1").lower() not in {"0", "false", "no", "off"}
+REAL_VTON_MODEL_ID = os.getenv("VTON_MODEL_ID", "fashn-ai/fashn-vton-1.5")
+REAL_VTON_WEIGHTS_DIR = MODELS_DIR / "fashn_vton"
+
+_REAL_VTON_PIPELINE = None
+_REAL_VTON_PIPELINE_ERROR: Optional[Exception] = None
+_REAL_VTON_LOCK = threading.Lock()
 
 
 def _load_font(size: int, bold: bool = False) -> ImageFont.ImageFont:
@@ -90,6 +99,212 @@ def _draw_label_block(
         draw.text((x, y), line, font=body_font, fill=(71, 85, 105))
         y += 25
     return y + 12
+
+
+def _has_real_vton_assets() -> bool:
+    return True
+
+
+def _prepare_model_image(image_path: Optional[Path], size: tuple[int, int] = (768, 1024)) -> Optional[Image.Image]:
+    if not image_path:
+        return None
+
+    path = Path(image_path)
+    if not path.exists():
+        return None
+
+    try:
+        image = Image.open(path).convert("RGBA")
+    except OSError:
+        return None
+
+    canvas = Image.new("RGBA", size, (255, 255, 255, 255))
+    image.thumbnail(size, Image.Resampling.LANCZOS)
+    x = (size[0] - image.width) // 2
+    y = (size[1] - image.height) // 2
+    canvas.alpha_composite(image, (x, y))
+    return canvas.convert("RGB")
+
+
+def _prepare_garment_image(image_path: Optional[Path], size: tuple[int, int] = (768, 1024)) -> Optional[Image.Image]:
+    if not image_path:
+        return None
+
+    path = Path(image_path)
+    if not path.exists():
+        return None
+
+    try:
+        image = Image.open(path).convert("RGB")
+    except OSError:
+        return None
+
+    canvas = Image.new("RGB", size, (255, 255, 255))
+    image.thumbnail((size[0] // 2, size[1] // 2), Image.Resampling.LANCZOS)
+    x = (size[0] - image.width) // 2
+    y = (size[1] - image.height) // 2
+    canvas.paste(image, (x, y))
+    return canvas
+
+
+def _combine_tryon_images(top_image: Image.Image, bottom_image: Optional[Image.Image] = None) -> Image.Image:
+    if bottom_image is None:
+        return top_image
+
+    top_rgba = top_image.convert("RGBA")
+    bottom_rgba = bottom_image.convert("RGBA").resize(top_rgba.size, Image.Resampling.LANCZOS)
+    width, height = top_rgba.size
+
+    blend_center = int(height * 0.58)
+    blend_half = max(24, int(height * 0.08))
+    final = Image.new("RGBA", top_rgba.size)
+
+    upper_mask = Image.new("L", top_rgba.size, 0)
+    upper_draw = ImageDraw.Draw(upper_mask)
+    upper_draw.rectangle((0, 0, width, blend_center - blend_half), fill=255)
+    upper_draw.rectangle((0, blend_center - blend_half, width, blend_center + blend_half), fill=160)
+
+    lower_mask = Image.new("L", top_rgba.size, 0)
+    lower_draw = ImageDraw.Draw(lower_mask)
+    lower_draw.rectangle((0, blend_center + blend_half, width, height), fill=255)
+    lower_draw.rectangle((0, blend_center - blend_half, width, blend_center + blend_half), fill=160)
+
+    final = Image.composite(top_rgba, final, upper_mask)
+    final = Image.composite(bottom_rgba, final, lower_mask)
+    return final
+
+
+def _download_fashn_weights(weights_dir: Path) -> None:
+    from huggingface_hub import hf_hub_download
+
+    weights_dir.mkdir(parents=True, exist_ok=True)
+    model_path = weights_dir / "model.safetensors"
+    dwpose_dir = weights_dir / "dwpose"
+    dwpose_dir.mkdir(parents=True, exist_ok=True)
+
+    if not model_path.exists():
+        hf_hub_download(
+            repo_id=REAL_VTON_MODEL_ID,
+            filename="model.safetensors",
+            local_dir=str(weights_dir),
+            local_dir_use_symlinks=False,
+        )
+
+    for filename in ("yolox_l.onnx", "dw-ll_ucoco_384.onnx"):
+        target = dwpose_dir / filename
+        if not target.exists():
+            hf_hub_download(
+                repo_id="fashn-ai/DWPose",
+                filename=filename,
+                local_dir=str(dwpose_dir),
+                local_dir_use_symlinks=False,
+            )
+
+
+def _load_real_vton_pipeline():
+    global _REAL_VTON_PIPELINE, _REAL_VTON_PIPELINE_ERROR
+
+    if _REAL_VTON_PIPELINE is not None:
+        return _REAL_VTON_PIPELINE
+
+    if _REAL_VTON_PIPELINE_ERROR is not None:
+        raise _REAL_VTON_PIPELINE_ERROR
+
+    with _REAL_VTON_LOCK:
+        if _REAL_VTON_PIPELINE is not None:
+            return _REAL_VTON_PIPELINE
+        if _REAL_VTON_PIPELINE_ERROR is not None:
+            raise _REAL_VTON_PIPELINE_ERROR
+
+        try:
+            from fashn_vton import TryOnPipeline
+        except Exception as exc:  # pragma: no cover - dependency fallback
+            _REAL_VTON_PIPELINE_ERROR = exc
+            raise
+
+        try:
+            _download_fashn_weights(REAL_VTON_WEIGHTS_DIR)
+            pipe = TryOnPipeline(weights_dir=str(REAL_VTON_WEIGHTS_DIR))
+            _REAL_VTON_PIPELINE = pipe
+            return pipe
+        except Exception as exc:
+            _REAL_VTON_PIPELINE_ERROR = exc
+            raise
+
+
+def _run_real_vton(
+    mannequin_path: Optional[Path],
+    top_path: Optional[Path] = None,
+    bottom_path: Optional[Path] = None,
+    accessory_path: Optional[Path] = None,
+    output_path: Optional[Path] = None,
+    prompt: Optional[Dict] = None,
+) -> Optional[Path]:
+    if not _has_real_vton_assets():
+        return None
+
+    pipe = _load_real_vton_pipeline()
+    input_image = _prepare_model_image(mannequin_path)
+    if input_image is None:
+        return None
+
+    garment_jobs: list[tuple[Path, str]] = []
+    if top_path and Path(top_path).exists():
+        garment_jobs.append((Path(top_path), "tops"))
+    if bottom_path and Path(bottom_path).exists():
+        garment_jobs.append((Path(bottom_path), "bottoms"))
+    if not garment_jobs and accessory_path and Path(accessory_path).exists():
+        garment_jobs.append((Path(accessory_path), "tops"))
+
+    if not garment_jobs:
+        return None
+
+    try:
+        with __import__("torch").inference_mode():
+            generated_images: list[Optional[Image.Image]] = []
+            for garment_source, garment_category in garment_jobs:
+                garment_image = _prepare_garment_image(garment_source)
+                if garment_image is None:
+                    generated_images.append(None)
+                    continue
+                generated = pipe(
+                    person_image=input_image,
+                    garment_image=garment_image,
+                    category=garment_category,
+                    garment_photo_type="model",
+                    num_samples=1,
+                    num_timesteps=28,
+                    guidance_scale=1.5,
+                    seed=42,
+                    segmentation_free=True,
+                )
+                generated_images.append(generated.images[0] if hasattr(generated, "images") else None)
+
+        valid_images = [img for img in generated_images if img is not None]
+        if not valid_images:
+            return None
+
+        merged = _combine_tryon_images(valid_images[0], valid_images[1] if len(valid_images) > 1 else None)
+
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False, dir=str(OUTPUT_DIR)) as tmp:
+            temp_generated_path = Path(tmp.name)
+        merged.save(temp_generated_path, "PNG")
+
+        final_output = fallback_generate_image(
+            mannequin_path=temp_generated_path,
+            top_path=top_path,
+            bottom_path=bottom_path,
+            accessory_path=accessory_path,
+            output_path=output_path,
+            prompt=prompt,
+        )
+        try:
+            temp_generated_path.unlink(missing_ok=True)
+        except OSError:
+            pass
+        return final_output
+    except Exception:
+        return None
 
 
 def fallback_generate_image(
@@ -183,26 +398,7 @@ def run_virtual_tryon(
     output_path = Path(output_path) if output_path else None
 
     if USE_REAL_VTON:
-        # TODO:
-        # 1. Load CatVTON/IDM-VTON model
-        # 2. Pass mannequin image and retrieved clothing image
-        # 3. Save generated image to output_path
-        #
-        # Keep fallback available so the web/API demo still works if model
-        # dependencies or weights are missing during prototyping.
-        try:
-            raise NotImplementedError("Real VTON integration is not enabled in this MVP.")
-        except Exception:
-            return fallback_generate_image(
-                mannequin_path=mannequin_path,
-                top_path=top_path,
-                bottom_path=bottom_path,
-                accessory_path=accessory_path,
-                output_path=output_path,
-                prompt=prompt,
-            )
-    else:
-        return fallback_generate_image(
+        generated = _run_real_vton(
             mannequin_path=mannequin_path,
             top_path=top_path,
             bottom_path=bottom_path,
@@ -210,3 +406,14 @@ def run_virtual_tryon(
             output_path=output_path,
             prompt=prompt,
         )
+        if generated is not None and generated.exists():
+            return generated
+
+    return fallback_generate_image(
+        mannequin_path=mannequin_path,
+        top_path=top_path,
+        bottom_path=bottom_path,
+        accessory_path=accessory_path,
+        output_path=output_path,
+        prompt=prompt,
+    )

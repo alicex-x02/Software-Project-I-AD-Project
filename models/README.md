@@ -1,21 +1,21 @@
 # Model Integration Notes
 
-This MVP does not download or install heavy virtual try-on models. The API and web page remain usable through the Pillow fallback renderer.
+This project now connects to a real virtual try-on model by default:
 
-Future integration candidates:
+- Active model: `fashn-ai/fashn-vton-1.5`
+- Weight cache: `models/fashn_vton/`
+- Integration point: `app/image_generator.py`
+
+Runtime flow:
+
+1. The app loads `FASHN VTON v1.5` through `fashn_vton.TryOnPipeline`.
+2. If weights are missing, they are downloaded from Hugging Face on first use.
+3. The model receives a person image plus a garment image and returns a try-on result.
+4. The result is wrapped back into the existing PNG presentation layout.
+5. If anything fails, the Pillow fallback renderer still generates a usable PNG.
+
+Future model candidates remain:
 
 - CatVTON
 - IDM-VTON
 - Stable Diffusion Inpainting
-
-Integration point:
-
-- `app/image_generator.py`
-- `run_virtual_tryon(mannequin_path, top_path, bottom_path, accessory_path, output_path, prompt)`
-
-Suggested future flow:
-
-1. Install model dependencies in a separate environment or optional requirements file.
-2. Place model weights under `models/` or configure an external model path.
-3. Set `USE_REAL_VTON = True` only after the model loader is implemented.
-4. Keep `fallback_generate_image()` available so demos still work when model loading fails.

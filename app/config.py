@@ -11,6 +11,7 @@ METADATA_PATH = CLOTHES_DIR / "metadata.json"
 PERSON_REF_DIR = DATA_DIR / "person_refs"
 PERSON_REF_METADATA_PATH = PERSON_REF_DIR / "metadata.json"
 VITON_HD_DIR = DATA_DIR / "viton_hd"
+DRESSCODE_DIR = DATA_DIR / "dresscode"
 OUTPUT_DIR = BASE_DIR / "outputs"
 MODELS_DIR = BASE_DIR / "models"
 
@@ -22,6 +23,7 @@ def ensure_runtime_dirs() -> None:
     CLOTHES_DIR.mkdir(parents=True, exist_ok=True)
     PERSON_REF_DIR.mkdir(parents=True, exist_ok=True)
     VITON_HD_DIR.mkdir(parents=True, exist_ok=True)
+    DRESSCODE_DIR.mkdir(parents=True, exist_ok=True)
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
 

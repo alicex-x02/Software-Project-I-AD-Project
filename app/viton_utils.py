@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 from typing import Iterable, Optional
 
-from app.config import BASE_DIR, VITON_HD_DIR
+from app.config import BASE_DIR, DRESSCODE_DIR, VITON_HD_DIR
 
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
@@ -58,6 +58,59 @@ def find_viton_cloth_mask_dir(viton_dir: Path = VITON_HD_DIR) -> Optional[Path]:
             viton_dir / "train" / "cloth-mask",
         ]
     )
+
+
+def find_dresscode_category_dir(dresscode_dir: Path = DRESSCODE_DIR, category: str = "upper_body") -> Optional[Path]:
+    category = (category or "").strip().lower()
+    return first_existing_dir(
+        [
+            dresscode_dir / category / "images",
+            dresscode_dir / "train" / category / "images",
+            dresscode_dir / "test" / category / "images",
+            dresscode_dir / category,
+        ]
+    )
+
+
+def find_dresscode_cloth_dir(dresscode_dir: Path = DRESSCODE_DIR, category: str = "upper_body") -> Optional[Path]:
+    return find_dresscode_category_dir(dresscode_dir, category)
+
+
+def list_dresscode_garments(dresscode_dir: Path = DRESSCODE_DIR, category: str = "upper_body", limit: Optional[int] = None) -> list[Path]:
+    category = (category or "").strip().lower()
+    category_root = dresscode_dir / category
+    images_dir = find_dresscode_cloth_dir(dresscode_dir, category)
+    if images_dir is None or not category_root.exists():
+        return []
+
+    pair_files = [
+        category_root / "train_pairs.txt",
+        category_root / "test_pairs_paired.txt",
+        category_root / "test_pairs_unpaired.txt",
+    ]
+
+    filenames: list[str] = []
+    for pair_file in pair_files:
+        if not pair_file.exists():
+            continue
+        for line in pair_file.read_text(encoding="utf-8").splitlines():
+            parts = line.strip().split()
+            if len(parts) >= 2:
+                filenames.append(parts[1])
+
+    if filenames:
+        seen = set()
+        garments: list[Path] = []
+        for name in filenames:
+            candidate = images_dir / name
+            if candidate.exists() and candidate not in seen:
+                seen.add(candidate)
+                garments.append(candidate)
+                if limit is not None and len(garments) >= max(limit, 0):
+                    break
+        return garments
+
+    return list_images(images_dir, limit)
 
 
 def project_relative(path: Path) -> str:
