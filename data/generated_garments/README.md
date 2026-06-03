@@ -17,7 +17,6 @@ data/generated_garments/
     <hash>.png
   bottom/
     <hash>.png
-  accessory/
     <hash>.png
 ```
 

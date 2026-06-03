@@ -21,26 +21,22 @@ def main() -> None:
     age_group = "kids"
     top = "red checkered shirt"
     bottom = "black pants"
-    accessory = "black backpack"
 
     mannequin_path = select_mannequin(gender, age_group)
     selected_top = retrieve_best_clothing(top, "top")
     selected_bottom = retrieve_best_clothing(bottom, "bottom")
-    selected_accessory = retrieve_best_clothing(accessory, "accessory")
 
     output_path = output_path_for("pipeline_test_result")
     generated_path = run_virtual_tryon(
         mannequin_path=mannequin_path,
         top_path=item_path(selected_top),
         bottom_path=item_path(selected_bottom),
-        accessory_path=item_path(selected_accessory),
         output_path=output_path,
         prompt={
             "gender": gender,
             "age_group": age_group,
             "top": top,
             "bottom": bottom,
-            "accessory": accessory,
         },
     )
 
@@ -51,7 +47,6 @@ def main() -> None:
     print(f"Mannequin: {mannequin_path}")
     print(f"Top: {selected_top['description'] if selected_top else None}")
     print(f"Bottom: {selected_bottom['description'] if selected_bottom else None}")
-    print(f"Accessory: {selected_accessory['description'] if selected_accessory else None}")
     print(f"Output: {generated_path}")
 
 

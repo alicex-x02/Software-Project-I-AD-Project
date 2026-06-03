@@ -79,21 +79,18 @@ def generate(payload: GenerateRequest):
 
     selected_top = retrieve_best_clothing(payload.top, "top") if payload.top.strip() else None
     selected_bottom = retrieve_best_clothing(payload.bottom, "bottom") if payload.bottom.strip() else None
-    selected_accessory = retrieve_best_clothing(payload.accessory, "accessory") if payload.accessory.strip() else None
 
     prompt = {
         "gender": gender,
         "age_group": age_group,
         "top": payload.top,
         "bottom": payload.bottom,
-        "accessory": payload.accessory,
     }
 
     generated_path = run_virtual_tryon(
         mannequin_path=mannequin_path,
         top_path=_item_image_path(selected_top),
         bottom_path=_item_image_path(selected_bottom),
-        accessory_path=_item_image_path(selected_accessory),
         output_path=output_path,
         prompt=prompt,
     )
@@ -106,7 +103,6 @@ def generate(payload: GenerateRequest):
         selected_clothes={
             "top": _selected_label(selected_top),
             "bottom": _selected_label(selected_bottom),
-            "accessory": _selected_label(selected_accessory),
         },
         message="PNG generated successfully using the garment cache and try-on pipeline.",
     )

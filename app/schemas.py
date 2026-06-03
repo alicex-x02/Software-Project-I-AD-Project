@@ -8,7 +8,6 @@ class GenerateRequest(BaseModel):
     age_group: str = "adult"
     top: str = Field(default="", max_length=200)
     bottom: str = Field(default="", max_length=200)
-    accessory: str = Field(default="", max_length=200)
     output_filename: Optional[str] = Field(default=None, max_length=120)
 
 

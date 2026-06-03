@@ -22,7 +22,6 @@ function formPayload() {
     age_group: document.getElementById("age_group").value,
     top: document.getElementById("top").value,
     bottom: document.getElementById("bottom").value,
-    accessory: document.getElementById("accessory").value,
     output_filename: document.getElementById("output_filename").value || null,
   };
 }

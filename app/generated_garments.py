@@ -65,14 +65,13 @@ def _prompt_for_garment(description: str, category: str) -> str:
     category_name = {
         "top": "shirt, hoodie, jacket, sweater, or other upper-body garment",
         "bottom": "pants, jeans, skirt, or other lower-body garment",
-        "accessory": "bag, cap, backpack, or other accessory",
     }.get(category, "garment")
 
     cleaned = (description or "").strip()
     return (
         "Create a clean studio product image of a single "
         f"{category_name} described as '{cleaned}'. "
-        "The image must show only the clothing item or accessory, centered, "
+        "The image must show only the clothing item, centered, "
         "front-facing, photorealistic, on a transparent background, with no person, "
         "no model, no text, no watermark, and no extra objects. "
         "Make it suitable as a virtual try-on garment reference."
@@ -109,7 +108,6 @@ def _make_local_placeholder_image(description: str, category: str) -> bytes:
     accent = {
         "top": (220, 38, 38, 255),
         "bottom": (37, 99, 235, 255),
-        "accessory": (109, 40, 217, 255),
     }.get(category, (71, 85, 105, 255))
 
     draw.rounded_rectangle((70, 70, 954, 954), radius=46, fill=(255, 255, 255, 238), outline=(203, 213, 225, 255), width=4)

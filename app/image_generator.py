@@ -2,7 +2,7 @@ import os
 import tempfile
 import threading
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Optional
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -101,10 +101,6 @@ def _draw_label_block(
     return y + 12
 
 
-def _has_real_vton_assets() -> bool:
-    return True
-
-
 def _prepare_model_image(image_path: Optional[Path], size: tuple[int, int] = (768, 1024)) -> Optional[Image.Image]:
     if not image_path:
         return None
@@ -160,7 +156,6 @@ def _combine_tryon_images(top_image: Image.Image, bottom_image: Optional[Image.I
     lower_start = max(0, waist - feather)
 
     final = top_rgba.copy()
-
     lower_crop = bottom_rgba.crop((0, lower_start, width, height))
     crop_height = lower_crop.height
     if crop_height <= 0:
@@ -222,7 +217,7 @@ def _load_real_vton_pipeline():
 
         try:
             from fashn_vton import TryOnPipeline
-        except Exception as exc:  # pragma: no cover - dependency fallback
+        except Exception as exc:  # pragma: no cover
             _REAL_VTON_PIPELINE_ERROR = exc
             raise
 
@@ -240,13 +235,9 @@ def _run_real_vton(
     mannequin_path: Optional[Path],
     top_path: Optional[Path] = None,
     bottom_path: Optional[Path] = None,
-    accessory_path: Optional[Path] = None,
     output_path: Optional[Path] = None,
-    prompt: Optional[Dict] = None,
+    prompt: Optional[dict] = None,
 ) -> Optional[Path]:
-    if not _has_real_vton_assets():
-        return None
-
     pipe = _load_real_vton_pipeline()
     input_image = _prepare_model_image(mannequin_path)
     if input_image is None:
@@ -257,9 +248,6 @@ def _run_real_vton(
         garment_jobs.append((Path(top_path), "tops"))
     if bottom_path and Path(bottom_path).exists():
         garment_jobs.append((Path(bottom_path), "bottoms"))
-    if not garment_jobs and accessory_path and Path(accessory_path).exists():
-        garment_jobs.append((Path(accessory_path), "tops"))
-
     if not garment_jobs:
         return None
 
@@ -298,7 +286,6 @@ def _run_real_vton(
             mannequin_path=temp_generated_path,
             top_path=top_path,
             bottom_path=bottom_path,
-            accessory_path=accessory_path,
             output_path=output_path,
             prompt=prompt,
         )
@@ -315,9 +302,8 @@ def fallback_generate_image(
     mannequin_path: Optional[Path],
     top_path: Optional[Path] = None,
     bottom_path: Optional[Path] = None,
-    accessory_path: Optional[Path] = None,
     output_path: Optional[Path] = None,
-    prompt: Optional[Dict] = None,
+    prompt: Optional[dict] = None,
 ) -> Path:
     """Create a deterministic presentation-friendly PNG without a VTON model."""
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -353,7 +339,6 @@ def fallback_generate_image(
     y = _draw_label_block(draw, info_x, y, "Gender / Age", f"{prompt.get('gender', 'unknown')} / {prompt.get('age_group', 'unknown')}", 295, label_font, body_font)
     y = _draw_label_block(draw, info_x, y, "Top", prompt.get("top", ""), 295, label_font, body_font)
     y = _draw_label_block(draw, info_x, y, "Bottom", prompt.get("bottom", ""), 295, label_font, body_font)
-    y = _draw_label_block(draw, info_x, y, "Accessory", prompt.get("accessory", ""), 295, label_font, body_font)
 
     thumb_y = max(y + 8, 460)
     draw.text((info_x, thumb_y), "Matched Clothes", font=label_font, fill=(24, 35, 51))
@@ -362,7 +347,6 @@ def fallback_generate_image(
     thumb_specs = [
         ("Top", top_path),
         ("Bottom", bottom_path),
-        ("Accessory", accessory_path),
     ]
     thumb_size = 88
     gap = 18
@@ -387,18 +371,16 @@ def run_virtual_tryon(
     mannequin_path,
     top_path=None,
     bottom_path=None,
-    accessory_path=None,
     output_path=None,
     prompt=None,
 ):
     """
     Future integration point for CatVTON, IDM-VTON, or Stable Diffusion inpainting.
-    For now, call fallback_generate_image().
+    For now, use the real VTON pipeline when available, otherwise fall back to PNG composition.
     """
     mannequin_path = Path(mannequin_path) if mannequin_path else None
     top_path = Path(top_path) if top_path else None
     bottom_path = Path(bottom_path) if bottom_path else None
-    accessory_path = Path(accessory_path) if accessory_path else None
     output_path = Path(output_path) if output_path else None
 
     if USE_REAL_VTON:
@@ -406,7 +388,6 @@ def run_virtual_tryon(
             mannequin_path=mannequin_path,
             top_path=top_path,
             bottom_path=bottom_path,
-            accessory_path=accessory_path,
             output_path=output_path,
             prompt=prompt,
         )
@@ -417,7 +398,6 @@ def run_virtual_tryon(
         mannequin_path=mannequin_path,
         top_path=top_path,
         bottom_path=bottom_path,
-        accessory_path=accessory_path,
         output_path=output_path,
         prompt=prompt,
     )

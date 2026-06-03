@@ -7,22 +7,9 @@ __pycache__/
 outputs/*
 !outputs/.gitkeep
 
-data/viton_hd/*
-!data/viton_hd/.gitkeep
-!data/viton_hd/README.md
-
-data/dresscode/*
-!data/dresscode/.gitkeep
-!data/dresscode/README.md
-
 data/generated_garments/*
 !data/generated_garments/.gitkeep
 !data/generated_garments/README.md
-
-data/person_refs/*
-!data/person_refs/.gitkeep
-!data/person_refs/README.md
-!data/person_refs/metadata.json
 
 models/fashn_vton/*
 !models/README.md
