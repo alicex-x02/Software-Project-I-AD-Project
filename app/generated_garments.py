@@ -11,6 +11,7 @@ from urllib.request import urlopen
 
 from openai import OpenAI
 from PIL import Image
+from PIL import ImageDraw, ImageFont
 from app.config import GENERATED_GARMENT_DIR
 from app.utils import project_relative
 
@@ -76,6 +77,62 @@ def _prompt_for_garment(description: str, category: str) -> str:
         "no model, no text, no watermark, and no extra objects. "
         "Make it suitable as a virtual try-on garment reference."
     )
+
+
+def _load_font(size: int, bold: bool = False) -> ImageFont.ImageFont:
+    candidates = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/dejavu/DejaVuSans.ttf",
+    ]
+    for candidate in candidates:
+        path = Path(candidate)
+        if path.exists():
+            return ImageFont.truetype(str(path), size)
+    return ImageFont.load_default()
+
+
+def _draw_centered_text(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int], text: str, font: ImageFont.ImageFont, fill: tuple[int, int, int]) -> None:
+    bbox = draw.textbbox((0, 0), text, font=font)
+    width = bbox[2] - bbox[0]
+    height = bbox[3] - bbox[1]
+    x = box[0] + (box[2] - box[0] - width) // 2
+    y = box[1] + (box[3] - box[1] - height) // 2
+    draw.text((x, y), text, font=font, fill=fill)
+
+
+def _make_local_placeholder_image(description: str, category: str) -> bytes:
+    category = (category or "garment").strip().lower()
+    canvas = Image.new("RGBA", (1024, 1024), (255, 255, 255, 0))
+    draw = ImageDraw.Draw(canvas)
+    outline = (60, 72, 88, 255)
+    fill = (226, 232, 240, 255)
+    accent = {
+        "top": (220, 38, 38, 255),
+        "bottom": (37, 99, 235, 255),
+        "accessory": (109, 40, 217, 255),
+    }.get(category, (71, 85, 105, 255))
+
+    draw.rounded_rectangle((70, 70, 954, 954), radius=46, fill=(255, 255, 255, 238), outline=(203, 213, 225, 255), width=4)
+    draw.rounded_rectangle((170, 170, 854, 780), radius=54, fill=fill, outline=outline, width=4)
+
+    if category == "top":
+        draw.polygon([(340, 260), (470, 210), (554, 210), (684, 260), (740, 380), (684, 430), (648, 355), (648, 690), (376, 690), (376, 355), (340, 430), (284, 380)], fill=accent, outline=outline)
+    elif category == "bottom":
+        draw.polygon([(350, 250), (674, 250), (720, 690), (560, 690), (530, 430), (498, 690), (332, 690)], fill=accent, outline=outline)
+        draw.line((512, 255, 512, 684), fill=(255, 255, 255, 120), width=4)
+    else:
+        draw.rounded_rectangle((340, 270, 684, 660), radius=60, fill=accent, outline=outline, width=4)
+        draw.arc((270, 320, 390, 600), 90, 270, fill=outline, width=14)
+        draw.arc((634, 320, 754, 600), 270, 90, fill=outline, width=14)
+
+    title_font = _load_font(44, bold=True)
+    body_font = _load_font(28)
+    _draw_centered_text(draw, (150, 820, 874, 880), description or f"generated {category}", title_font, (31, 41, 55, 255))
+    _draw_centered_text(draw, (150, 890, 874, 940), f"OpenAI cache placeholder - {category}", body_font, (71, 85, 105, 255))
+
+    buffer = BytesIO()
+    canvas.save(buffer, format="PNG")
+    return buffer.getvalue()
 
 
 def _decode_openai_image_response(response) -> bytes:
@@ -185,12 +242,12 @@ def generate_or_load_garment_image(description: str, category: str) -> Optional[
             image_bytes = None
 
         if image_bytes is None:
-            return None
+            image_bytes = _make_local_placeholder_image(description, category)
 
         try:
             Image.open(BytesIO(image_bytes)).verify()
         except Exception:
-            return None
+            image_bytes = _make_local_placeholder_image(description, category)
 
         output_path.write_bytes(image_bytes)
 

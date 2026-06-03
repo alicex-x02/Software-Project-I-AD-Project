@@ -185,34 +185,16 @@ def retrieve_best_clothing(description: str, category: str) -> Optional[Dict]:
             return _generated_clothing_item(description, category, generated_path)
 
     category_items = [item for item in load_metadata() if item.get("category") == category]
+    if category_items:
+        query_tokens = tokenize_text(description)
+        best_item = category_items[0]
+        best_score = -1
+        for item in category_items:
+            score = score_item(query_tokens, item)
+            if score > best_score:
+                best_item = item
+                best_score = score
+        if best_score > 0:
+            return best_item
 
-    if category in {"top", "bottom"}:
-        dresscode_items = [item for item in category_items if str(item.get("source_dataset") or "").lower() == "dresscode"]
-        if not dresscode_items:
-            dresscode_items = _cloth_items_from_disk("DressCode", DRESSCODE_DIR, category)
-        if dresscode_items:
-            category_items = dresscode_items
-        else:
-            viton_items = [item for item in category_items if _is_real_dataset_item(item)]
-            if not viton_items:
-                viton_items = _cloth_items_from_disk("VITON-HD", VITON_HD_DIR, category)
-            if viton_items:
-                category_items = viton_items
-
-    if not category_items:
-        return None
-
-    query_tokens = tokenize_text(description)
-    best_item = category_items[0]
-    best_score = -1
-
-    for item in category_items:
-        score = score_item(query_tokens, item)
-        if score > best_score:
-            best_item = item
-            best_score = score
-
-    if best_score <= 0:
-        return category_items[0]
-
-    return best_item
+    return None
