@@ -155,22 +155,26 @@ def _combine_tryon_images(top_image: Image.Image, bottom_image: Optional[Image.I
     bottom_rgba = bottom_image.convert("RGBA").resize(top_rgba.size, Image.Resampling.LANCZOS)
     width, height = top_rgba.size
 
-    blend_center = int(height * 0.58)
-    blend_half = max(24, int(height * 0.08))
-    final = Image.new("RGBA", top_rgba.size)
+    waist = int(height * 0.58)
+    feather = max(28, int(height * 0.06))
+    lower_start = max(0, waist - feather)
 
-    upper_mask = Image.new("L", top_rgba.size, 0)
-    upper_draw = ImageDraw.Draw(upper_mask)
-    upper_draw.rectangle((0, 0, width, blend_center - blend_half), fill=255)
-    upper_draw.rectangle((0, blend_center - blend_half, width, blend_center + blend_half), fill=160)
+    final = top_rgba.copy()
 
-    lower_mask = Image.new("L", top_rgba.size, 0)
-    lower_draw = ImageDraw.Draw(lower_mask)
-    lower_draw.rectangle((0, blend_center + blend_half, width, height), fill=255)
-    lower_draw.rectangle((0, blend_center - blend_half, width, blend_center + blend_half), fill=160)
+    lower_crop = bottom_rgba.crop((0, lower_start, width, height))
+    crop_height = lower_crop.height
+    if crop_height <= 0:
+        return top_rgba
 
-    final = Image.composite(top_rgba, final, upper_mask)
-    final = Image.composite(bottom_rgba, final, lower_mask)
+    mask = Image.new("L", (width, crop_height), 0)
+    mask_draw = ImageDraw.Draw(mask)
+    fade_start = max(0, int(crop_height * 0.08))
+    fade_end = max(fade_start + 1, int(crop_height * 0.18))
+    body_start = max(0, int(crop_height * 0.18))
+    mask_draw.rectangle((0, body_start, width, crop_height), fill=255)
+    mask_draw.rectangle((0, fade_start, width, fade_end), fill=160)
+
+    final.paste(lower_crop, (0, lower_start), mask)
     return final
 
 
