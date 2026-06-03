@@ -108,7 +108,7 @@ def generate(payload: GenerateRequest):
             "bottom": _selected_label(selected_bottom),
             "accessory": _selected_label(selected_accessory),
         },
-        message="PNG generated successfully using the fallback MVP renderer.",
+        message="PNG generated successfully using the garment cache and try-on pipeline.",
     )
 
 

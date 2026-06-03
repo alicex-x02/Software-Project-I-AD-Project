@@ -1,6 +1,8 @@
 __pycache__/
 *.pyc
 .venv/
+.env
+.env.*
 
 outputs/*
 !outputs/.gitkeep
@@ -12,6 +14,10 @@ data/viton_hd/*
 data/dresscode/*
 !data/dresscode/.gitkeep
 !data/dresscode/README.md
+
+data/generated_garments/*
+!data/generated_garments/.gitkeep
+!data/generated_garments/README.md
 
 data/person_refs/*
 !data/person_refs/.gitkeep

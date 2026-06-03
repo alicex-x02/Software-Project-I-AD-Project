@@ -1,5 +1,8 @@
+from app.env_loader import load_project_env
 from pathlib import Path
 
+
+load_project_env()
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 APP_DIR = BASE_DIR / "app"
@@ -12,6 +15,7 @@ PERSON_REF_DIR = DATA_DIR / "person_refs"
 PERSON_REF_METADATA_PATH = PERSON_REF_DIR / "metadata.json"
 VITON_HD_DIR = DATA_DIR / "viton_hd"
 DRESSCODE_DIR = DATA_DIR / "dresscode"
+GENERATED_GARMENT_DIR = DATA_DIR / "generated_garments"
 OUTPUT_DIR = BASE_DIR / "outputs"
 MODELS_DIR = BASE_DIR / "models"
 
@@ -24,6 +28,7 @@ def ensure_runtime_dirs() -> None:
     PERSON_REF_DIR.mkdir(parents=True, exist_ok=True)
     VITON_HD_DIR.mkdir(parents=True, exist_ok=True)
     DRESSCODE_DIR.mkdir(parents=True, exist_ok=True)
+    GENERATED_GARMENT_DIR.mkdir(parents=True, exist_ok=True)
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
 

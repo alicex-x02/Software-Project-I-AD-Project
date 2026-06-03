@@ -7,6 +7,7 @@ from typing import Dict, List, Optional, Sequence, Set
 from PIL import Image
 
 from app.config import DRESSCODE_DIR, METADATA_PATH, VITON_HD_DIR
+from app.generated_garments import generate_or_load_garment_image
 from app.utils import resolve_project_path
 from app.viton_utils import (
     find_viton_cloth_dir,
@@ -148,6 +149,21 @@ def _cloth_items_from_disk(dataset_name: str, dataset_dir: Path, category: str, 
     return items
 
 
+def _generated_clothing_item(description: str, category: str, image_path: Path) -> Dict:
+    tokens = tokenize_text(description)
+    return {
+        "id": f"openai_{category}_{safe_id_part(image_path)}",
+        "category": category,
+        "image_path": project_relative(image_path),
+        "tags": sorted(set(["openai", "generated", "garment", category] + list(tokens))),
+        "manual_tags": [],
+        "description": description,
+        "source_dataset": "OpenAI Generated",
+        "source_path": project_relative(image_path),
+        "needs_manual_tags": False,
+    }
+
+
 def score_item(query_tokens: Sequence[str], item: Dict) -> int:
     item_tokens = _item_tokens(item)
     return len(set(query_tokens) & item_tokens)
@@ -160,6 +176,14 @@ def retrieve_best_clothing(description: str, category: str) -> Optional[Dict]:
     retriever can keep this function signature and replace scoring with image
     and text embeddings while preserving API behavior.
     """
+    description = (description or "").strip()
+    category = (category or "").strip().lower()
+
+    if description:
+        generated_path = generate_or_load_garment_image(description, category)
+        if generated_path and generated_path.exists():
+            return _generated_clothing_item(description, category, generated_path)
+
     category_items = [item for item in load_metadata() if item.get("category") == category]
 
     if category in {"top", "bottom"}:

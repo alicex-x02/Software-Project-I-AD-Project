@@ -2,7 +2,8 @@
 
 웹 폼에서 성별, 나이대, 인상착의를 입력하면 FastAPI 서버가 마네킹 이미지와 옷 이미지 DB를 선택하고, 결과 PNG를 생성해 미리보기와 다운로드를 제공하는 발표용 MVP입니다.
 
-현재 버전은 기본적으로 Pillow 기반 fallback renderer가 항상 PNG를 생성합니다. 동시에 `USE_REAL_VTON=1`이면 FASHN VTON v1.5를 lazy-load해서 실제 virtual try-on 추론을 먼저 시도하고, 실패하면 즉시 fallback으로 돌아갑니다.
+현재 버전은 기본적으로 Pillow 기반 fallback renderer가 항상 PNG를 생성합니다. 동시에 `USE_REAL_VTON=1`이면 FASHN VTON v1.5를 lazy-load해서 실제 virtual try-on 추론을 먼저 시도하고, 실패하면 즉시 fallback으로 돌아갑니다.  
+또한 `OPENAI_API_KEY`가 설정되어 있으면, 입력된 의상 설명을 OpenAI 이미지 생성 API로 먼저 옷 이미지로 만들고 `data/generated_garments/`에 캐시한 뒤 그 이미지를 VTON에 넣습니다. 같은 의상을 다시 넣으면 캐시 이미지를 재사용합니다.
 
 ## Project Structure
 
@@ -36,6 +37,8 @@ softwareproject1/
     clothes/
       README.md
       metadata.json
+    generated_garments/
+      README.md
   outputs/
   scripts/
     setup_dirs.py
@@ -69,6 +72,31 @@ python scripts/build_sample_db.py
 이 명령은 `data/clothes/`에 dummy clothes PNG와 `metadata.json`을 만들고, `data/mannequins/`에 샘플 마네킹 PNG를 생성합니다.
 
 VITON-HD 데이터셋이 없을 때는 이 dummy sample DB가 자동 fallback으로 사용됩니다.
+
+## 2-0. OpenAI 옷 이미지 생성 캐시
+
+입력한 `Top`, `Bottom`, `Accessory` 설명이 있으면 앱이 먼저 OpenAI 이미지 생성 API로 해당 의상 이미지를 만듭니다. 생성된 이미지는 `data/generated_garments/` 아래에 저장되고, 같은 설명이 다시 들어오면 다시 생성하지 않고 캐시된 PNG를 재사용합니다.
+
+`.env` 파일로 두고 싶으면 프로젝트 루트에 아래처럼 적어두면 됩니다. 앱이 시작할 때 자동으로 읽습니다.
+
+```bash
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_IMAGE_MODEL=gpt-image-1.5
+```
+
+필수 설정:
+
+```bash
+export OPENAI_API_KEY="your_openai_api_key"
+```
+
+선택 설정:
+
+```bash
+export OPENAI_IMAGE_MODEL="gpt-image-1.5"
+```
+
+키가 없거나 OpenAI 호출이 실패하면 기존 데이터셋 기반 fallback으로 내려갑니다. 즉, 앱 자체는 계속 실행됩니다.
 
 ## 2-1. DressCode 데이터셋 배치
 

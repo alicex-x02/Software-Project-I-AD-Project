@@ -13,3 +13,4 @@ dependencies:
       - numpy
       - diffusers
       - safetensors
+      - openai
